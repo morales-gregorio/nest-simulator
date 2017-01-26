@@ -1,3 +1,6 @@
+import sys
+print sys.path
+
 import elephant
 import neo
 import matplotlib.pyplot as plt
@@ -5,7 +8,7 @@ import numpy as np
 import quantities as pq
 
 import nest
-from nest.neo_bridge import block_from_device, segment_from_device, from_device
+from neo_bridge import block_from_device, segment_from_device, from_device
 
 
 nest.ResetKernel()
