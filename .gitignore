@@ -8,6 +8,7 @@ pynest/pynestkernel.cpp
 *.lo
 *.la
 .*
+*~
 *.log
 *.pyc
 
@@ -62,3 +63,6 @@ lib/sli/rcsinfo.sli
 extras/nest_vars.sh
 
 pynest/examples/README
+*.pyc
+*.png
+cmake
