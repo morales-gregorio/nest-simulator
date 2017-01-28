@@ -33,8 +33,7 @@ def from_device(device):
     Returns:
     --------
     
-    """
-    
+    """    
     # Determine whether the device saved to memory or to file
     to_memory = nest.GetStatus(device, 'to_memory')
     to_file = nest.GetStatus(device, 'to_file')
@@ -60,28 +59,40 @@ def from_device(device):
                 gid=gid)
                 #sampling_period=nest.GetKernelStatus('resolution'))
 
-            device_parameters = nest.GetStatus(device)[0]
-            for s in device_parameters:
-                # These 3 parameters are special and are handled above
-                if s not in ['events', 'senders', 'times']:
-                    try:
-                        x.annotate(**{s: device_parameters[s]})
-                    except ValueError:
-                        # For annotations which are of a special type, such as
-                        # SLILiteral, we store a string representation
+            # Annotate everything from the spike detector and the sender
+            for annotation_device, annotation_prefix in zip(
+                    [device, (gid,)], ["detector", "sender"]):
+                
+                # Retrieve parameters
+                device_parameters = nest.GetStatus(annotation_device)[0]
+                for parameter in device_parameters:
+                    # Discard special parameters (e.g., handled above)
+                    if parameter not in ['events']:
+                
+                        # Neo annotation should make clear which device
+                        # contributes the information
+                        annotation = annotation_prefix + "_" + parameter
                         try:
-                            x.annotate(**{s: str(device_parameters[s])})
-                        except:
-                            warnings.warn(
-                                "pynest.neo_bridge: Cannot create annotation "
-                                " for key %s", s)
-                    
+                            x.annotate(
+                                **{annotation: device_parameters[parameter]})
+                        except ValueError:
+                            # For annotations which are of a special type, such as
+                            # SLILiteral, we store a string representation
+                            try:
+                                x.annotate(**{annotation: str(
+                                    device_parameters[parameter])})
+                            except:
+                                warnings.warn(
+                                    "pynest.neo_bridge: Cannot create "
+                                    "annotation for key %parameter", parameter)
             
+            # Annotate everything from the spike detector
             st.append(x)
 
         return st
     
     # Get data from file
     if to_file:
+        # TODO: Implement file based neo_bridge based on the Neo GDF IO
         raise NotImplementedError(
             'pynest.neo_bridge: Loading from file not implemented.')
