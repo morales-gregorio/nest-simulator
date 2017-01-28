@@ -57,9 +57,31 @@ def from_device(device):
                 t_stop=nest.GetKernelStatus('time') * pq.ms)
             
             x.annotate(
-                gid=gid, 
-                sampling_period=nest.GetKernelStatus('resolution'))
+                gid=gid)
+                #sampling_period=nest.GetKernelStatus('resolution'))
+
+            device_parameters = nest.GetStatus(device)[0]
+            for s in device_parameters:
+                # These 3 parameters are special and are handled above
+                if s not in ['events', 'senders', 'times']:
+                    try:
+                        x.annotate(**{s: device_parameters[s]})
+                    except ValueError:
+                        # For annotations which are of a special type, such as
+                        # SLILiteral, we store a string representation
+                        try:
+                            x.annotate(**{s: str(device_parameters[s])})
+                        except:
+                            warnings.warn(
+                                "pynest.neo_bridge: Cannot create annotation "
+                                " for key %s", s)
+                    
             
             st.append(x)
 
         return st
+    
+    # Get data from file
+    if to_file:
+        raise NotImplementedError(
+            'pynest.neo_bridge: Loading from file not implemented.')
