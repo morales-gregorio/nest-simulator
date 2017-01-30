@@ -119,17 +119,20 @@ def from_device(device):
 
     Parameters:
     -----------
-
+    device : tuple of int
+    
     Returns:
     --------
-
+    spike_trains : list of neo.SpikeTrain
+    channel_annotations : list of dict
+    unit_annotations : list of dict
     """
     # Determine whether the device saved to memory or to file
     to_memory = nest.GetStatus(device, 'to_memory')
     to_file = nest.GetStatus(device, 'to_file')
 
     if not to_memory and not to_file:
-        raise ValueError('pynest.neo_bridge: Device did not output to memory.')
+        raise ValueError('pynest.neo_bridge: Device did not output data.')
 
     # Get data from memory
     if to_memory:
