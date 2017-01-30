@@ -99,6 +99,7 @@ def brunel_delta_nest_task(simulation_time, neuron_number, conn_prob):
                type: image/png
     '''
 
+    # Here: Create a Neo Block to hold the data
     simulation_block = new_experiment()
     nest.ResetKernel()
 
@@ -314,7 +315,12 @@ def brunel_delta_nest_task(simulation_time, neuron_number, conn_prob):
 
     print("Simulating")
 
-    add_simulation(50., simulation_block)
+    # Here: add_simulation instead of nest.simulate() 
+    add_simulation(
+        time=simulation_time,
+        blk=simulation_block,
+        name='BRUNEL',
+        description="Simulation of a Brunel Network")
 
     '''
     Storage of the time point after the simulation of the network in a
@@ -386,10 +392,11 @@ def brunel_delta_nest_task(simulation_time, neuron_number, conn_prob):
     filename = 'brunel_delta_nest.png'
     plt.savefig(filename)
     
-    
+    # Save data to Neo Block
     add_data_from_device(espikes, simulation_block)
     add_data_from_device(ispikes, simulation_block)
     
+    # Save file in NIX format
     filename = "brunel.nix"
     if os.path.exists(filename):
         os.remove(filename)
