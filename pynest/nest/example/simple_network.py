@@ -71,7 +71,3 @@ print("")
 
 # Add results to Neo Block
 add_data_from_device(spikedetector, simulation_block)
-
-# Extract spike trains of Unit 1
-spike_trains = simulation_block.filter(gid=1, objects=neo.SpikeTrain)
-

@@ -97,18 +97,17 @@ def add_data_from_device(device, blk):
 
             sgmt.spiketrains.append(spiketrain_cut)
             
-            gid = spiketrain_cut.annotations['gid']
+            gid = unit_annotation['global_id']
             unit = blk.filter(
-                targdict={"gid": gid}, container=True, objects=neo.Unit)
+                targdict={"global_id": gid}, container=True, objects=neo.Unit)
             if not unit:
-                unit = [neo.Unit(gid = gid)]
-                unit[0].annotate(gid = gid)
+                unit = [neo.Unit()]
                 unit[0].annotate(**unit_annotation)
                 channelind.units.append(unit[0])
             elif len(unit)!=1:
                 raise ValueError(
                     "pynest.neo_bridge: Neo Block has multiple units "
-                    "for gid %i." % gid)
+                    "for global_id %i." % gid)
             unit[0].spiketrains.append(spiketrain_cut)
             unit[0].create_relationship()
 
@@ -150,7 +149,6 @@ def from_device(device):
                 t_stop=nest.GetKernelStatus('time') * pq.ms)
 
             x.annotate(
-                gid=gid,
                 sampling_period=nest.GetKernelStatus('resolution'))
             
             export_annotations = {}

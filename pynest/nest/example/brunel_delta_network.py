@@ -215,7 +215,7 @@ def brunel_delta_nest_task(simulation_time, neuron_number, conn_prob):
     noise    = nest.Create("poisson_generator")
     espikes  = nest.Create("spike_detector")
     ispikes  = nest.Create("spike_detector")
-
+    
     '''
     Configuration of the spike detectors recording excitatory and
     inhibitory spikes using `SetStatus`, which expects a list of node
@@ -397,19 +397,19 @@ def brunel_delta_nest_task(simulation_time, neuron_number, conn_prob):
     add_data_from_device(ispikes, simulation_block)
     
     # Save file in NIX format
-    filename = "brunel.nix"
+    filename = "brunel_output.nix"
     if os.path.exists(filename):
         os.remove(filename)
-    outfile = NixIO(filename, mode="rw")
+    outfile = NixIO(filename, mode="ow")
     outfile.write_block(simulation_block)
     
 if __name__ == '__main__':
-    brunel_delta_nest_task(simulation_time=1000.0,
+    brunel_delta_nest_task(simulation_time=600.0,
                            neuron_number=2500,
                            conn_prob=0.1)
     
     print("Loading data")
-    filename = "brunel.nix"
+    filename = "brunel_output.nix"
     outfile = NixIO(filename, mode="ro")
     loaded_block = outfile.read_block()
 
