@@ -18,10 +18,11 @@ if __name__ == '__main__':
     outfile = NixIO(filename, mode="ro")
     loaded_block = outfile.read_block()
 
-    print("Calculating cross-correlation")
+    print("Selecting excitatory neurons")
     spike_trains = loaded_block.filter(
         detector_label="brunel-py-ex", objects=neo.SpikeTrain)
     
+    print("Calculating cross-correlation")
     cc=elephant.spike_train_correlation.corrcoef(
         elephant.conversion.BinnedSpikeTrain(
             spike_trains,binsize=1.*pq.ms),
