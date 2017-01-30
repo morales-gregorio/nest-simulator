@@ -7,8 +7,6 @@ from numpy import exp
 
 import neo
 from neo.io.nixio import NixIO 
-from neo_bridge import new_experiment, add_simulation, add_data_from_device,\
-    from_device
 import elephant.spike_train_correlation
 import elephant.conversion
 import quantities as pq
