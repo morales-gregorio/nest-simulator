@@ -407,21 +407,4 @@ if __name__ == '__main__':
     brunel_delta_nest_task(simulation_time=600.0,
                            neuron_number=2500,
                            conn_prob=0.1)
-    
-    print("Loading data")
-    filename = "brunel_output.nix"
-    outfile = NixIO(filename, mode="ro")
-    loaded_block = outfile.read_block()
-
-    print("Calculating cross-correlation")
-    spike_trains = loaded_block.filter(
-        detector_label="brunel-py-ex", objects=neo.SpikeTrain)
-    
-    cc=elephant.spike_train_correlation.corrcoef(
-        elephant.conversion.BinnedSpikeTrain(
-            spike_trains,binsize=1.*pq.ms),
-        binary=False)
-
-    plt.figure()
-    plt.pcolor(cc)
-    plt.show()
+     
