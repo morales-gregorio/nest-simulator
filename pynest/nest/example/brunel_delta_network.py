@@ -50,14 +50,24 @@ network are recorded and a spike raster is plotted..
 Importing all necessary modules for simulation, analysis and plotting.
 '''
 
+import os
 import matplotlib
-matplotlib.use('Agg')
+#matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import nest
 import nest.raster_plot
 import time
 from numpy import exp
 
+
+import neo
+from neo.io.hdf5io import NeoHdf5IO 
+from neo.io.nixio import NixIO 
+from neo_bridge import new_experiment, add_simulation, add_data_from_device,\
+    from_device
+import elephant.spike_train_correlation
+import elephant.conversion
+import quantities as pq
 
 def brunel_delta_nest_task(simulation_time, neuron_number, conn_prob):
     '''
@@ -89,6 +99,7 @@ def brunel_delta_nest_task(simulation_time, neuron_number, conn_prob):
                type: image/png
     '''
 
+    simulation_block = new_experiment()
     nest.ResetKernel()
 
     '''
@@ -303,7 +314,7 @@ def brunel_delta_nest_task(simulation_time, neuron_number, conn_prob):
 
     print("Simulating")
 
-    nest.Simulate(simtime)
+    add_simulation(50., simulation_block)
 
     '''
     Storage of the time point after the simulation of the network in a
@@ -368,16 +379,42 @@ def brunel_delta_nest_task(simulation_time, neuron_number, conn_prob):
 
     nest.raster_plot.from_device(espikes, hist=True)
 
-
     '''
     Save the figure.
     '''
 
     filename = 'brunel_delta_nest.png'
     plt.savefig(filename)
-
-
+    
+    
+    add_data_from_device(espikes, simulation_block)
+    add_data_from_device(ispikes, simulation_block)
+    
+    filename = "brunel.nix"
+    if os.path.exists(filename):
+        os.remove(filename)
+    outfile = NixIO(filename, mode="rw")
+    outfile.write_block(simulation_block)
+    
 if __name__ == '__main__':
     brunel_delta_nest_task(simulation_time=1000.0,
                            neuron_number=2500,
                            conn_prob=0.1)
+    
+    print("Loading data")
+    filename = "brunel.nix"
+    outfile = NixIO(filename, mode="ro")
+    loaded_block = outfile.read_block()
+
+    print("Calculating cross-correlation")
+    spike_trains = loaded_block.filter(
+        detector_label="brunel-py-ex", objects=neo.SpikeTrain)
+    
+    cc=elephant.spike_train_correlation.corrcoef(
+        elephant.conversion.BinnedSpikeTrain(
+            spike_trains,binsize=1.*pq.ms),
+        binary=False)
+
+    plt.figure()
+    plt.pcolor(cc)
+    plt.show()

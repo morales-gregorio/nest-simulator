@@ -6,13 +6,16 @@ import quantities as pq
 import elephant
 import neo
 
-from neo_bridge import block_from_device, segment_from_device, from_device
+from neo_bridge import new_experiment, add_simulation, add_data_from_device,\
+    from_device
 import nest
 
 # Set up kernel
 nest.ResetKernel()
 # nest.SetKernelStatus({'overwrite_files': True})
 nest.SetKernelStatus({'resolution': 0.01})
+
+simulation_block = new_experiment()
 
 print "Status of NEST Kernel before simulation"
 ks_before = nest.GetKernelStatus()
@@ -33,7 +36,9 @@ poisson = nest.Create('poisson_generator', 1, {'rate': 16000.})
 nest.Connect(neuron, spikedetector)
 nest.Connect(poisson, neuron)
 
-nest.Simulate(500.)
+simulation_segment = add_simulation(500., simulation_block)
+simulation_segment2 = add_simulation(1500., simulation_block)
+#nest.Simulate(500.)
 
 print("Changes of status of NEST Kernel after simulation")
 ks_after = nest.GetKernelStatus()
@@ -54,12 +59,30 @@ for s in spds:
     print(s, ": ", spds[s])
 print("")
 
-spike_trains = from_device(spikedetector)
+add_data_from_device(spikedetector, simulation_block)
 
-print("Annotations of spike train 1")
-for s in spike_trains[0].annotations:
-    print(s, ": ", spike_trains[0].annotations[s])
-print("")
+print simulation_block.segments[0].annotations['t_start']
+print simulation_block.segments[0].annotations['t_stop']
+print simulation_block.segments[1].annotations['t_start']
+print simulation_block.segments[1].annotations['t_stop']
+print simulation_block.segments[0].spiketrains[0].t_start
+print simulation_block.segments[0].spiketrains[0].t_stop
+print simulation_block.segments[0].spiketrains[1].t_start
+print simulation_block.segments[0].spiketrains[1].t_stop
+print simulation_block.segments[1].spiketrains[0].t_start
+print simulation_block.segments[1].spiketrains[0].t_stop
+print simulation_block.channel_indexes
+print simulation_block.channel_indexes[0].units
+
+spike_trains = simulation_block.filter(gid=1, objects=neo.SpikeTrain)
+
+
+#spike_trains = from_device(spikedetector)
+
+# print("Annotations of spike train 1")
+# for s in spike_trains[0].annotations:
+#     print(s, ": ", spike_trains[0].annotations[s])
+# print("")
 
 
 # my_block = block_from_device(spikedetector)
