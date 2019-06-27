@@ -65,4 +65,10 @@ extras/nest_vars.sh
 pynest/examples/README
 *.pyc
 *.png
+*.nix
+*.el
 cmake
+*.cmake
+*.in
+
+help
