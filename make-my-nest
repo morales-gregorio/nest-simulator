@@ -1,6 +1,9 @@
 # This is a helper script to execute the makefile generator cmake with a 
-# specific conda environment and without GSL/readline
-cmake -Dwith-gsl=OFF -Dwith-readline=OFF -Dwith-python=3 \
+# specific conda environment
+
+rm CMakeCache.txt
+
+cmake -Dwith-python=3 \
 -DPYTHON_EXECUTABLE=~/miniconda3/envs/hlst-elephant/bin/python \
 -DPYTHON_LIBRARY=~/miniconda3/envs/hlst-elephant/lib/libpython3.7m.so \
 -DCMAKE_INSTALL_PREFIX:PATH=~/bin/nest3 .
